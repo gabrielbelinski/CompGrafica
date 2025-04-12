@@ -126,6 +126,6 @@ def main():
 if __name__ == '__main__':
     while True:
         main()
-        continua_execucao = int(input("Deseja executar o programa novamente? 1 - Sim, 2 - Nao\n"))
+        continua_execucao = int(input("Voce deseja executar o programa novamente? 1 - Sim, 2 - Nao\n"))
         if continua_execucao == 2:
             break
