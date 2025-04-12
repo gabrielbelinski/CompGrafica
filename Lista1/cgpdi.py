@@ -40,7 +40,7 @@ def histograma(imagem, nome_arquivo):
     lista_cores = [i for i in range(256)]
     for i in range(256):
         vetor[i] = np.sum(imagem == i)
-    opcao = int(input("Selecione o tipo de histograma desejado:\n1-Histograma\n2-Histograma Normalizado\n3-Histograma Acumulado\n4-Histograma Acumulado Normalizado\n"))
+    opcao = int(input("Selecione o tipo de histograma desejado:\n1-Histograma\n2-Histograma Normalizado\n3-Histograma Acumulado\n4-Histograma Acumulado Normalizado\n5-Equalizacao histograma\n"))
     match opcao:
         case 1:
             plt.bar(lista_cores, vetor)
@@ -50,23 +50,36 @@ def histograma(imagem, nome_arquivo):
             plt.bar(lista_cores, vetor)
             plt.title("Histograma normalizado")
         case 3:
-            vetor = acumula_vetor(vetor)
+            vetor = np.cumsum(vetor)
             plt.bar(lista_cores, vetor)
             plt.title("Histograma acumulado")
         case 4:
-            vetor = acumula_vetor(vetor)
-            vetor = normaliza_vetor(vetor)
+            vetor = normaliza_vetor(np.cumsum(vetor))
             plt.bar(lista_cores, vetor)
             plt.title("Histograma acumulado normalizado")
+        case 5:
+            histograma_acumulado = np.cumsum(vetor)
+            if len(imagem.shape) == 3:
+                imagem = rgb_para_cinza(imagem)
+            min_ha = min(histograma_acumulado) 
+            T = (histograma_acumulado - min_ha) / ((imagem.shape[0]*imagem.shape[1]) - min_ha) * (256 - 1)
+            img_equalizada = T[imagem]
+            img_equalizada = (255 * (img_equalizada / img_equalizada.max())).astype(np.uint8)
+            cv.imshow('Equalizacao de histograma', img_equalizada)
+            cv.waitKey(0)
+            cv.destroyAllWindows()
+
         case _:
             print("Opcao invalida\n")
             opcao = int(input(
-                "Selecione o tipo de histograma desejado:\n1-Histograma\n2-Histograma Normalizado\n3-Histograma Acumulado\n4-Histograma Acumulado Normalizado\n"))
+                "Selecione o tipo de histograma desejado:\n1-Histograma\n2-Histograma Normalizado\n3-Histograma Acumulado\n4-Histograma Acumulado Normalizado\n5-Equalizacao de histograma\n"))
 
-    plt.xlabel("Intensidade")
-    plt.ylabel("Frequencia")
-    plt.savefig("histograma{}".format(nome_arquivo))
-    plt.show()
+    if opcao != 5:
+        plt.xlabel("Intensidade")
+        plt.ylabel("Frequencia")
+        #plt.savefig("histograma{}".format(nome_arquivo))
+        plt.show()
+
 
 def normaliza_vetor(vetor):
     vetor_normalizado = np.zeros(256, dtype=float)
@@ -76,13 +89,6 @@ def normaliza_vetor(vetor):
 
     return vetor_normalizado
 
-def acumula_vetor(vetor):
-    vetor_acumulado = np.cumsum(vetor)
-    return vetor_acumulado
-
-def equalizacao_histograma(imagem, vetor, vetor_acumulado):
-    s = (acumula_vetor(vetor) - min(vetor_acumulado)) / ((imagem.shape[0]*imagem.shape[1]) - min(vetor_acumulado))
-    return s
 
 def main():
     nome_arquivo = input("Digite o nome do arquivo: ")
