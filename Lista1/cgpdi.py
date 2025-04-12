@@ -62,9 +62,9 @@ def histograma(imagem, nome_arquivo):
             if len(imagem.shape) == 3:
                 imagem = rgb_para_cinza(imagem)
             min_ha = min(histograma_acumulado) 
-            T = (histograma_acumulado - min_ha) / ((imagem.shape[0]*imagem.shape[1]) - min_ha) * (256 - 1)
+            T = (histograma_acumulado-min_ha) / ((imagem.shape[0]*imagem.shape[1]) - min_ha) * (256-1)
             img_equalizada = T[imagem]
-            img_equalizada = (255 * (img_equalizada / img_equalizada.max())).astype(np.uint8)
+            img_equalizada = (255 * (img_equalizada/img_equalizada.max())).astype(np.uint8)
             cv.imshow('Equalizacao de histograma', img_equalizada)
             cv.waitKey(0)
             cv.destroyAllWindows()
