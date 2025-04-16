@@ -31,9 +31,26 @@ def operador_potencia(imagem):
     imagem = c*np.power(imagem,gama)
     return normalizacao(imagem)
 
-def fatiamento(imagem):
-    imagem = (imagem > 128) * 255
-    return imagem.astype(np.uint8)
+def fatiamento(imagem, nome_arquivo):
+    imagem = rgb_para_cinza(imagem)
+    planos = [np.zeros((imagem.shape[0], imagem.shape[1]), dtype=np.uint8) for _ in range(8)]
+
+    for i in range(imagem.shape[0]):
+        for j in range(imagem.shape[1]):
+            pixel = imagem[i][j]
+            for bit in range(8):
+                planos[bit][i,j] = ((pixel >> bit) & 1) * 255
+
+    fig, axes = plt.subplots(2, 4, figsize=(12, 6))
+    axes = axes.ravel()
+    for ax, img in zip(axes, planos):
+        ax.imshow(img, cmap='gray')
+        ax.axis('off')
+
+    plt.tight_layout()
+    plt.savefig('{}fatiamento.png'.format(nome_arquivo.split('.')[0]), dpi=300)
+    plt.show()
+
 
 def histograma(imagem, nome_arquivo):
     vetor = np.zeros(256, dtype=int)
@@ -109,7 +126,7 @@ def main():
         case 5:
             img = operador_potencia(img)
         case 6:
-            img = fatiamento(img)
+            fatiamento(img, nome_arquivo)
         case 7:
             histograma(img, nome_arquivo)
             #histograma(img[:, :, 0], nome_arquivo)
